@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-=======
 //Package main is used for your program's main() function,
 //plus any other code you want to include in the main package.
 //All types, functions, and globals in a package are visible
@@ -12,8 +7,6 @@ import (
 //to code in other packages. To export something, make its
 //name start with a capital letter (I know, it's kind of goofy
 //but that's just the way Go works).
-package main
-
 //If you want to use functions or types defined in other
 //packages, you need to import them. For standard library
 //packages, you just use the package name here. After you
@@ -26,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
->>>>>>> 46207e10a0f295133df826d0f4b28533972f696b
 	"log"
 	"net/http"
 	"os"
@@ -40,20 +32,6 @@ type zip struct {
 	State string `json:"state"`
 }
 
-<<<<<<< HEAD
-type zipSlice []*zip
-type zipIndex map[string]zipSlice
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-
-	w.Header().Add("Content-Type", "text/plain")
-
-	w.Write([]byte("hello " + name))
-}
-
-//* means receving a pointer
-=======
 //zipSlice is a slice of pointers to zip structs (*zip)
 type zipSlice []*zip
 
@@ -179,52 +157,19 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello " + name))
 }
 
->>>>>>> 46207e10a0f295133df826d0f4b28533972f696b
 func (zi zipIndex) zipsForCityHandler(w http.ResponseWriter, r *http.Request) {
 	// /zips/city/seattle
 	_, city := path.Split(r.URL.Path)
 	lcity := strings.ToLower(city)
 
-<<<<<<< HEAD
-	w.Header().Add("Cotent-Type", "application/json; charset=utf-8")
-=======
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
->>>>>>> 46207e10a0f295133df826d0f4b28533972f696b
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(zi[lcity]); err != nil {
 		http.Error(w, "error encoding json: "+err.Error(), http.StatusInternalServerError)
 	}
-<<<<<<< HEAD
 
-}
-
-func main() {
-	addr := os.Getenv("ADDR")
-	fmt.Println(addr)
-	if len(addr) == 0 {
-		log.Fatal("please set ADDR environment variable")
-	}
-
-	f, err := os.Open("zips.json")
-	if err != nil {
-		log.Fatal("error opening zips file: " + err.Error())
-	}
-
-	zips := make(zipSlice, 0, 43000)
-	decoder := json.NewDecoder(f) //reads strram of bytes
-	//if there is an error then handle error
-	if err := decoder.Decode(&zips); err != nil {
-		log.Fatal("error decoding zips json: " + err.Error())
-	}
-	fmt.Printf("loaded %d zips\n", len(zips))
-
-	zi := make(zipIndex)
-
-	// range is like foreach loops
-	// iterating for pointers to zips
-=======
 }
 
 //main is the entry-point for all go programs
@@ -261,7 +206,6 @@ func main() {
 	//build a map of lower-cased city name
 	//to the zips in that city
 	zi := make(zipIndex)
->>>>>>> 46207e10a0f295133df826d0f4b28533972f696b
 	for _, z := range zips {
 		lower := strings.ToLower(z.City)
 		zi[lower] = append(zi[lower], z)
@@ -269,13 +213,6 @@ func main() {
 
 	fmt.Printf("there are %d zips in Seattle\n", len(zi["seattle"]))
 
-<<<<<<< HEAD
-	http.HandleFunc("/hello", helloHandler)
-
-	http.HandleFunc("/zips/city/", zi.zipsForCityHandler)
-
-	fmt.Printf("server is listening at %s...\n", addr)
-=======
 	//Register our helloHandler as the handler for
 	//the `/hello` resource path. Whenever a request
 	//is made to this path, the Go web server will
@@ -304,6 +241,6 @@ func main() {
 	//but if it can't actually start (e.g., can't bind)
 	//to the port number you gave it), it will return
 	//and error, which we will log using log.Fatal().
->>>>>>> 46207e10a0f295133df826d0f4b28533972f696b
+
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
