@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-const defaultPort = "80"
+const defaultPort = "443"
 
 const (
 	headerContentType              = "Content-Type"
@@ -124,6 +124,9 @@ func main() {
 	}
 	addr := fmt.Sprintf("%s:%s", host, port)
 
+	certPath := os.Getenv("CERTPATH")
+	keyPath := os.Getenv("KEYPATH")
+
 	zips, err := loadZipsFromCSV("zips.csv")
 
 	//if there was an error loading the zips, report it an exit
@@ -146,5 +149,5 @@ func main() {
 
 	fmt.Printf("server is listening at %s...\n", addr)
 
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Fatal(http.ListenAndServeTLS(addr, certPath, keyPath, nil))
 }
