@@ -123,6 +123,8 @@ func main() {
 		port = defaultPort
 	}
 	addr := fmt.Sprintf("%s:%s", host, port)
+	certPath := os.Getenv("CERTPATH")
+	keyPath := os.Getenv("KEYPATH")
 
 	certPath := os.Getenv("CERTPATH")
 	keyPath := os.Getenv("KEYPATH")

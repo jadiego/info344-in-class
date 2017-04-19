@@ -1,4 +1,3 @@
-package main
 
 //Package main is used for your program's main() function,
 //plus any other code you want to include in the main package.
@@ -7,6 +6,11 @@ package main
 //to code in other packages. To export something, make its
 //name start with a capital letter (I know, it's kind of goofy
 //but that's just the way Go works).
+
+=======
+package main
+
+
 //If you want to use functions or types defined in other
 //packages, you need to import them. For standard library
 //packages, you just use the package name here. After you
@@ -241,6 +245,5 @@ func main() {
 	//but if it can't actually start (e.g., can't bind)
 	//to the port number you gave it), it will return
 	//and error, which we will log using log.Fatal().
-
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
