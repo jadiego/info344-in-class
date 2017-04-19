@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"strings"
 
 	"encoding/json"
+
 
 	"io"
 
@@ -75,7 +77,9 @@ func getPageSummary(URL string) (*PageSummary, error) {
 	} //for each token
 } //getPageSummary()
 
+
 //receiver type
+
 type HandlerContext struct {
 	redisClient *redis.Client
 }
@@ -88,8 +92,10 @@ func (ctx *HandlerContext) SummaryHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+
 	//cehck if we have seen the url or not
 	//check if there are any other bytes associated with that in the redis DB
+
 	jbuf, err := ctx.redisClient.Get(URL).Bytes()
 	if err != nil && err != redis.Nil {
 		http.Error(w, "error getting from cache: "+err.Error(), http.StatusInternalServerError)
@@ -106,12 +112,14 @@ func (ctx *HandlerContext) SummaryHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+
 		//marshal takes any value and converts to json
 		jbuf, err = json.Marshal(pgsum)
 		if err != nil {
 			http.Error(w, "error marshalling json: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 
 		//a minute
 		ctx.redisClient.Set(URL, jbuf, time.Second*60)
@@ -129,7 +137,13 @@ func main() {
 	}
 	addr := host + ":" + port
 
-	//option we need to set
+
+	//opt
+  
+  
+  
+  
+  n we need to set
 	ropts := redis.Options{
 		Addr: "localhost:6379",
 	}

@@ -3,3 +3,5 @@ node_modules
 .vscode
 .idea
 certs
+npm-debug.log
+tls

@@ -34,6 +34,7 @@ func main() {
 		buf := make([]byte, len(v)+len(sig))
 		copy(buf, v)
 
+		//copy sig into last part of buf
 		copy(buf[len(v):], sig)
 		fmt.Println(base64.URLEncoding.EncodeToString(buf))
 
@@ -53,7 +54,8 @@ func main() {
 		if hmac.Equal(sig, sig2) {
 			fmt.Println("signature is valid!")
 		} else {
-			fmt.Println("DANGER DANGER INVALID!")
+
+			fmt.Println("DANGER DANGER INVALID!!")
 		}
 	}
 }
