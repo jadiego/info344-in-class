@@ -1,4 +1,3 @@
-
 //Package main is used for your program's main() function,
 //plus any other code you want to include in the main package.
 //All types, functions, and globals in a package are visible
@@ -7,7 +6,6 @@
 //name start with a capital letter (I know, it's kind of goofy
 //but that's just the way Go works).
 
-=======
 package main
 
 
@@ -35,6 +33,7 @@ type zip struct {
 	City  string `json:"city"`
 	State string `json:"state"`
 }
+
 
 //zipSlice is a slice of pointers to zip structs (*zip)
 type zipSlice []*zip
@@ -166,7 +165,10 @@ func (zi zipIndex) zipsForCityHandler(w http.ResponseWriter, r *http.Request) {
 	_, city := path.Split(r.URL.Path)
 	lcity := strings.ToLower(city)
 
+
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
+
+
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 
 	encoder := json.NewEncoder(w)
@@ -175,6 +177,7 @@ func (zi zipIndex) zipsForCityHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
 
 //main is the entry-point for all go programs
 //program execution starts with this function
@@ -210,12 +213,14 @@ func main() {
 	//build a map of lower-cased city name
 	//to the zips in that city
 	zi := make(zipIndex)
+
 	for _, z := range zips {
 		lower := strings.ToLower(z.City)
 		zi[lower] = append(zi[lower], z)
 	}
 
 	fmt.Printf("there are %d zips in Seattle\n", len(zi["seattle"]))
+
 
 	//Register our helloHandler as the handler for
 	//the `/hello` resource path. Whenever a request
