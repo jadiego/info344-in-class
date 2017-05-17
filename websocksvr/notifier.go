@@ -20,7 +20,10 @@ type Notifier struct {
 func NewNotifier() *Notifier {
 	//TODO: create, initialize and return
 	//a Notifier struct
-	return nil
+	return &Notifier{
+		eventq:  make(chan interface{}, 100),
+		clients: make(map[*websocket.Conn]bool),
+	}
 }
 
 //Start begins a loop that checks for new events

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 //MessageEvent represents an event with a message
@@ -39,6 +41,17 @@ func WebSocketUpgradeHandler(w http.ResponseWriter, r *http.Request) {
 	//CheckOrigin field of the Upgrader to allow upgrades from
 	//any origin.
 	//See https://godoc.org/github.com/gorilla/websocket#hdr-Origin_Considerations
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin:     func(r *http.Request) bool { return true },
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	//after upgrading, use the `.AddClient()` to add the new
 	//connection to your notifier
@@ -51,6 +64,8 @@ func main() {
 	//TODO: create a NewNotifier and call
 	//its .Start() method on a new goroutine
 	// go mynotifier.Start()
+	mynotifier := NewNotifier()
+	go mynotifier.Start()
 
 	//your handlers will need access to this notifer
 	//instance, so share it with them somehow
