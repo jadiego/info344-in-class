@@ -36,6 +36,11 @@ func (ctx *HandlerContext) TriggerEvent(w http.ResponseWriter, r *http.Request) 
 	//and the current time for CreatedAt
 	//Then pass the MessageEvent to the `.Notify()` method of your notifier
 	//so that the event gets broadcasted to all web socket clients
+	me := MessageEvent{
+		Message:   "Hello World!",
+		CreatedAt: time.Now(),
+	}
+	ctx.Notifier.Notify(me)
 }
 
 //WebSocketUpgradeHandler handles websocket upgrade requests
@@ -55,23 +60,17 @@ func (ctx *HandlerContext) WebSocketUpgradeHandler(w http.ResponseWriter, r *htt
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		http.Error(w, "error upgrading connection:"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	//after upgrading, use the `.AddClient()` method on your notifier
 	//to add the new client to your notifier's map of clients
-
+	ctx.Notifier.AddClient(conn)
 }
 
 func main() {
 	addr := "localhost:4000"
-
-	//TODO: create a NewNotifier and call
-	//its .Start() method on a new goroutine
-	// go mynotifier.Start()
-	mynotifier := NewNotifier()
-	go mynotifier.Start()
 
 	ctx := &HandlerContext{
 		Notifier: NewNotifier(),
@@ -79,6 +78,7 @@ func main() {
 
 	//TODO: start the notifier by calling
 	//its .Start() method on a new goroutine
+	go ctx.Notifier.Start()
 
 	http.HandleFunc("/v1/ws", ctx.WebSocketUpgradeHandler)
 	http.HandleFunc("/v1/trigger", ctx.TriggerEvent)

@@ -19,6 +19,7 @@ class MongoStore {
      */
     getAll() {
         //TODO: implement this
+        return this.collection.find().toArray();
     }
 
     /**
@@ -27,6 +28,7 @@ class MongoStore {
      */
     insert(task) {
         //TODO: implement this
+        return this.collection.insert(task);
     }
 
     /**
@@ -36,6 +38,12 @@ class MongoStore {
      */
     async setComplete(id, complete) {
         //TODO: implement this
+        let options = { returnOriginal: false };
+        let updates = { $set: { complete: complete } };
+        let oid = new mongodb.ObjectID(id);
+        let result = await this.collection.findOneAndUpdate(
+            { _id: iod }, updates, options);
+        return result.value;
     }
 
     /**
@@ -44,6 +52,7 @@ class MongoStore {
      */
     delete(id) {
         //TODO: implement this
+        return this.collection.deleteOne({_id: new mongodb.ObjectID(id)});
     }
 }
 

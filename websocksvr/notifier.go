@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"sync"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -14,6 +17,7 @@ type Notifier struct {
 	//remember that go maps ARE NOT safe for
 	//concurrent access, so you must do something
 	//to protect the `clients` map
+	mu sync.RWMutex
 }
 
 //NewNotifier constructs a new Notifer.
@@ -23,6 +27,8 @@ func NewNotifier() *Notifier {
 	return &Notifier{
 		eventq:  make(chan interface{}, 100),
 		clients: make(map[*websocket.Conn]bool),
+		//TODO: protect this map with a RWMutex
+		mu: sync.RWMutex{},
 	}
 }
 
@@ -35,6 +41,9 @@ func (n *Notifier) Start() {
 	//this should check for new events written
 	//to the `eventq` channel, and broadcast
 	//them to all of the web socket clients
+	for {
+		n.broadcast(<-n.eventq)
+	}
 }
 
 //AddClient adds a new web socket client to the Notifer
@@ -44,18 +53,25 @@ func (n *Notifier) AddClient(client *websocket.Conn) {
 	//an HTTP handler, and each HTTP request is
 	//processed on its own goroutine, so your
 	//implementation here MUST be safe for concurrent use
+	n.mu.Lock()
+	defer n.mu.Unlock()
 
 	//after you add the client to the map,
 	//call n.readPump() on its own goroutine
 	//to proces all of the control messages sent
 	//by the client to the server.
 	//see https://godoc.org/github.com/gorilla/websocket#hdr-Control_Messages
+	n.clients[client] = false
+	fmt.Printf("clients: %+v\n", n.clients)
+	go n.readPump(client)
 
 }
 
 //Notify will add a new event to the event queue
 func (n *Notifier) Notify(event interface{}) {
 	//TODO: add the `event` to the `eventq`
+	fmt.Printf("adding to eventq: %v\n", event)
+	n.eventq <- event
 }
 
 //readPump will read all messages (including control messages)
@@ -67,7 +83,12 @@ func (n *Notifier) readPump(client *websocket.Conn) {
 	//TODO: implement this according to the notes in the
 	//Control Message section of the Gorilla Web Socket docs:
 	//https://godoc.org/github.com/gorilla/websocket#hdr-Control_Messages
-
+	for {
+		if _, _, err := client.NextReader(); err != nil {
+			client.Close()
+			break
+		}
+	}
 }
 
 //broadcast sends the event to all client as a JSON-encoded object
@@ -79,6 +100,13 @@ func (n *Notifier) broadcast(event interface{}) {
 	//and for even better performance, try using a PreparedMessage:
 	//https://godoc.org/github.com/gorilla/websocket#PreparedMessage
 	//https://godoc.org/github.com/gorilla/websocket#Conn.WritePreparedMessage
+	for key := range n.clients {
+		err := key.WriteJSON(event)
+		if err != nil {
+			key.Close()
+			delete(n.clients, key)
+		}
+	}
 
 	//If you get an error while writing to a client,
 	//the client has wandered off, so you should call
